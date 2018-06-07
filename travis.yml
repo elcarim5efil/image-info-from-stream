@@ -11,7 +11,4 @@ install:
 - npm install --only=dev
 
 script:
-
-after_script:
 - npm run test:ci
-- npm run coveralls
