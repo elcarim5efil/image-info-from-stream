@@ -4,7 +4,8 @@
   "description": "access image info from stream",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test-ci": "jest --ci --coverage"
   },
   "repository": {
     "type": "git",
