@@ -1,6 +1,6 @@
 // https://github.com/image-size/image-size/blob/master/lib/types/jpg.js
 
-const processStream = require('../helpers/process-image-stream');
+const processStream = require('../helpers/process-stream');
 
 function isJPG (buffer) {
   var SOIMarker = buffer.toString('hex', 0, 2);

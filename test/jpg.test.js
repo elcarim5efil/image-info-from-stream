@@ -2,10 +2,10 @@ const getImageInfo = require('../src/index');
 const path = require('path');
 const ImageStream = require('../src/helpers/image-stream');
 const fs = require('fs');
-const stream = fs.createReadStream(path.resolve(__dirname, './assets/slot3.jpg'));
+const stream = fs.createReadStream(path.resolve(__dirname, './assets/test.jpg'));
 
 test('jpg', () => {
-  getImageInfo(stream)
+  return getImageInfo(stream)
     .then((res) => {
       const { stream, size, type } = res;
 
@@ -17,14 +17,5 @@ test('jpg', () => {
         height: 616,
       });
       expect(stream).toBeInstanceOf(ImageStream);
-
-      // stream.on('data', (data) => {
-      //   buffer.push(data);
-      // });
-
-      // stream.on('end', () => {
-      //   let image = Buffer.concat(buffer);
-      //   console.log(image.length)
-      // });
   });
 });

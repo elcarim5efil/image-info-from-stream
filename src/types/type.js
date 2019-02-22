@@ -1,4 +1,4 @@
-const processStream = require('../helpers/process-image-stream');
+const processStream = require('../helpers/process-stream');
 const JPG = require('./jpg');
 const PNG = require('./png');
 

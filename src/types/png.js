@@ -1,6 +1,6 @@
 // https://github.com/image-size/image-size/blob/master/lib/types/png.js
 
-const processStream = require('../helpers/process-image-stream');
+const processStream = require('../helpers/process-stream');
 
 var pngSignature = 'PNG\r\n\x1a\n';
 var pngImageHeaderChunkName = 'IHDR';
