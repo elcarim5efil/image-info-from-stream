@@ -5,25 +5,31 @@
 
 ## introduction
 
-access image info from stream
+access image size from stream.
+
+support image file types:
+
+- `.jpg`
+- `.png`
+- `.gif`
+- `.bmp`
 
 ## usage
 
 ```javascript
-  getImageInfo(stream)
-    .then((res) => {
-      const {stream, size, type } = res;
+const getImageInfo = require('image-infor-from-stream');
 
-      const name = `${size.width}_${size.height}.${type}`;
+getImageInfo(stream)
+  .then(({ stream, width, height, type }) => {
+    const name = `${width}x${height}.${type}`;
+    let buffer = [];
 
-      let buffer = [];
+    stream.on('data', (data) => {
+      buffer.push(data);
+    });
 
-      stream.on('data', (data) => {
-        buffer.push(data);
-      });
-
-      stream.on('end', () => {
-        let image = Buffer.concat(buffer);
-      });
-  });
+    stream.on('end', () => {
+      let image = Buffer.concat(buffer);
+    });
+});
 ```
