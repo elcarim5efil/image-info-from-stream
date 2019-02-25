@@ -6,7 +6,7 @@ const stream = fs.createReadStream(path.resolve(__dirname, './assets/test.txt'))
 
 getImageInfo(stream)
   .then((res) => {
-    const { stream, size, type } = res;
+    const { stream, height, width, type } = res;
 
     let buffer = [];
 

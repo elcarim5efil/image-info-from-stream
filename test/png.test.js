@@ -7,15 +7,13 @@ const stream = fs.createReadStream(path.resolve(__dirname, './assets/test.png'))
 test('png', () => {
   return getImageInfo(stream)
     .then((res) => {
-      const { stream, size, type } = res;
+      const { stream, width, height, type } = res;
 
       let buffer = [];
 
       expect(type).toBe('png');
-      expect(size).toEqual({
-        width: 1170,
-        height: 616,
-      });
+      expect(width).toEqual(1170);
+      expect(height).toEqual(616);
       expect(stream).toBeInstanceOf(ImageStream);
   });
 });

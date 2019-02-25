@@ -61,10 +61,11 @@ function getImageStream(stream) {
       // 0xFFC2 is progressive(SOF2)
       next = temp[i + blockSize + 1 + offset];
       if (next === 0xC0 || next === 0xC1 || next === 0xC2) {
-        let size = extractSize(temp, i + blockSize + 5);
+        let { width, height } = extractSize(temp, i + blockSize + 5);
         return {
           type: 'jpg',
-          size,
+          width,
+          height
         };
       }
 

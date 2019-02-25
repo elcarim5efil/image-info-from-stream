@@ -31,20 +31,19 @@ function isPNG (buffer) {
 
 function getImageStream(stream) {
   function onData(data) {
-    let size;
+    let width, height;
     if (data.toString('ascii', 12, 16) === pngFriedChunkName) {
-      size = {
-        width: data.readUInt32BE(32),
-        height: data.readUInt32BE(36)
-      };
+      width = data.readUInt32BE(32);
+      height = data.readUInt32BE(36);
+    } else {
+      width = data.readUInt32BE(16);
+      height = data.readUInt32BE(20);
     }
-    size = {
-      width: data.readUInt32BE(16),
-      height: data.readUInt32BE(20)
-    };
+
     return {
       type: 'png',
-      size
+      height,
+      width
     };
   }
   return processStream(stream, { onData });

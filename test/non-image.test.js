@@ -14,14 +14,5 @@ test('not image', () => {
       expect(type).toBe('unknown');
       expect(size).toBeUndefined();
       expect(stream).toBeInstanceOf(ImageStream);
-
-      // stream.on('data', (data) => {
-      //   buffer.push(data);
-      // });
-
-      // stream.on('end', () => {
-      //   let image = Buffer.concat(buffer);
-      //   console.log(image.length)
-      // });
   });
 });
