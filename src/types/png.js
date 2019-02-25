@@ -10,15 +10,16 @@
 
 const processStream = require('../helpers/process-stream');
 
-var pngSignature = 'PNG\r\n\x1a\n';
-var pngImageHeaderChunkName = 'IHDR';
+const pngSignature = 'PNG\r\n\x1a\n';
+const pngImageHeaderChunkName = 'IHDR';
 
 // Used to detect "fried" png's: http://www.jongware.com/pngdefry.html
-var pngFriedChunkName = 'CgBI'; 
+const pngFriedChunkName = 'CgBI'; 
 
 function isPNG (buffer) {
+  let chunkName
   if (pngSignature === buffer.toString('ascii', 1, 8)) {
-    var chunkName = buffer.toString('ascii', 12, 16);
+    chunkName = buffer.toString('ascii', 12, 16);
     if (chunkName === pngFriedChunkName) {
       chunkName = buffer.toString('ascii', 28, 32);
     }
