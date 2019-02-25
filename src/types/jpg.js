@@ -1,4 +1,12 @@
-// https://github.com/image-size/image-size/blob/master/lib/types/jpg.js
+/**
+ * Size and type logic is based on image-size by
+ * netroy (@image-size)
+ * Licensed under the MIT License
+ * https://github.com/image-size/image-size/blob/master/LICENSE
+ *
+ * modified by (@elcarim)
+ * https://github.com/image-size/image-size/blob/master/lib/types/jpg.js
+ */ 
 
 const processStream = require('../helpers/process-stream');
 
