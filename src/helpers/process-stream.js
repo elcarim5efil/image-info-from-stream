@@ -7,21 +7,25 @@ function process(stream, options) {
     const { onData = noop, onEnd = noop } = options;
     const readable = new ImageStream();
     let result;
-    let buffer = [];
+    let innerBuffer = [];
 
     stream.on('data', (data) => {
+      // if the result is fetched, just add to the readable stream
       if (result) {
         readable.add(data);
         return;
       }
 
-      buffer.push(data);
+      innerBuffer.push(data);
       result = onData(data, readable, result);
 
       if (result) {
-        buffer.forEach(b => {
+        // if the result is fetched, flush the innerBuffer to a readable stream
+        innerBuffer.forEach(b => {
           readable.add(b);
         });
+
+        // resolve the result
         resolve(Object.assign({}, result, {
           stream: readable
         }));
