@@ -30,25 +30,24 @@ function isPNG (buffer) {
 }
 
 function getImageStream(stream) {
-  return processStream(stream, {
-    onData(data) {
-      let size;
-      if (data.toString('ascii', 12, 16) === pngFriedChunkName) {
-        size = {
-          'width': data.readUInt32BE(32),
-          'height': data.readUInt32BE(36)
-        };
-      }
+  function onData(data) {
+    let size;
+    if (data.toString('ascii', 12, 16) === pngFriedChunkName) {
       size = {
-        'width': data.readUInt32BE(16),
-        'height': data.readUInt32BE(20)
-      };
-      return {
-        type: 'png',
-        size
+        width: data.readUInt32BE(32),
+        height: data.readUInt32BE(36)
       };
     }
-  });
+    size = {
+      width: data.readUInt32BE(16),
+      height: data.readUInt32BE(20)
+    };
+    return {
+      type: 'png',
+      size
+    };
+  }
+  return processStream(stream, { onData });
 }
 
 module.exports = {

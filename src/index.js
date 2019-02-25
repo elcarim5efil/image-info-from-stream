@@ -12,7 +12,10 @@ function getImageInfo(stream) {
       } else if(type === 'png') {
         return PNG.getImageStream(stream);
       }
-      return stream;
+      return {
+        type,
+        stream
+      };
     })
 }
 

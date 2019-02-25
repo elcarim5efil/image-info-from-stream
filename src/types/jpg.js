@@ -17,8 +17,8 @@ function isJPG (buffer) {
 
 function extractSize (buffer, i) {
   return {
-    'height' : buffer.readUInt16BE(i),
-    'width' : buffer.readUInt16BE(i + 2)
+    height: buffer.readUInt16BE(i),
+    width: buffer.readUInt16BE(i + 2)
   };
 }
 
@@ -38,103 +38,41 @@ function getImageStream(stream) {
   let partIndex = 0;
   let i = -1;
   let offset = 0;
-  return processStream(stream, {
-    onData(data) {
-      offset = buffer[partIndex] && buffer[partIndex].length || 0;
-      partIndex++;
+  function onData(data) {
+    offset = buffer[partIndex] && buffer[partIndex].length || 0;
+    partIndex++;
 
-      let temp = data;
-
-      // start
-      if (i === -1) {
-        i = 4;
-      }
-
-      let next;
-      while (i < temp.length) {
-        // read length of the next block
-        let blockSize = temp.readUInt16BE(i + offset);
-
-        // ensure correct format
-        validateBuffer(temp, i + blockSize + offset);
-
-        // 0xFFC0 is baseline standard(SOF)
-        // 0xFFC1 is baseline optimized(SOF)
-        // 0xFFC2 is progressive(SOF2)
-        next = temp[i + blockSize + 1 + offset];
-        if (next === 0xC0 || next === 0xC1 || next === 0xC2) {
-          let size = extractSize(temp, i + blockSize + 5);
-          return {
-            type: 'jpg',
-            size,
-          }
-        }
-
-        // move to the next block
-        i += blockSize + 2;
-      }
+    let temp = data;
+    // start
+    if (i === -1) {
+      i = 4;
     }
-  })
-  // return new Promise((resolve, reject) => {
-  //   const readable = new ImageStream();
 
-  //   let buffer = [];
-  //   let partIndex = 0;
-  //   let i = -1;
-  //   let offset = 0;
-  //   let res;
+    let next;
+    while (i < temp.length) {
+      // read length of the next block
+      let blockSize = temp.readUInt16BE(i + offset);
 
-  //   stream.on('data', (data) => {
-  //     if (res) {
-  //       readable.add(data);
-  //       return;
-  //     }
-  //     offset = buffer[partIndex] && buffer[partIndex].length || 0;
-  //     buffer.push(data);
-  //     partIndex++;
+      // ensure correct format
+      validateBuffer(temp, i + blockSize + offset);
 
-  //     let temp = data;
+      // 0xFFC0 is baseline standard(SOF)
+      // 0xFFC1 is baseline optimized(SOF)
+      // 0xFFC2 is progressive(SOF2)
+      next = temp[i + blockSize + 1 + offset];
+      if (next === 0xC0 || next === 0xC1 || next === 0xC2) {
+        let size = extractSize(temp, i + blockSize + 5);
+        return {
+          type: 'jpg',
+          size,
+        };
+      }
 
-  //     // start
-  //     if (i === -1) {
-  //       i = 4;
-  //     }
-
-  //     let next;
-  //     while (i < temp.length && !res) {
-  //       // read length of the next block
-  //       let blockSize = temp.readUInt16BE(i + offset);
-
-  //       // ensure correct format
-  //       validateBuffer(temp, i + blockSize + offset);
-
-  //       // 0xFFC0 is baseline standard(SOF)
-  //       // 0xFFC1 is baseline optimized(SOF)
-  //       // 0xFFC2 is progressive(SOF2)
-  //       next = temp[i + blockSize + 1 + offset];
-  //       if (next === 0xC0 || next === 0xC1 || next === 0xC2) {
-  //         res = extractSize(temp, i + blockSize + 5);
-  //         buffer.forEach((b) => {
-  //           readable.add(b);
-  //         });
-  //         resolve({
-  //           type: 'jpg',
-  //           stream: readable,
-  //           size: res
-  //         });
-  //         break;
-  //       }
-
-  //       // move to the next block
-  //       i += blockSize + 2;
-  //     }
-
-  //   });
-
-  //   stream.on('end', () => {
-  //     readable.add(null);
-  //   })
-  // });
+      // move to the next block
+      i += blockSize + 2;
+    }
+  }
+  return processStream(stream, { onData });
 }
 
 module.exports = {

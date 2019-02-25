@@ -6,23 +6,23 @@ function process(stream, options) {
   return new Promise((resolve, reject) => {
     const { onData = noop, onEnd = noop } = options;
     const readable = new ImageStream();
-    let res;
+    let result;
     let buffer = [];
 
     stream.on('data', (data) => {
-      if (res) {
+      if (result) {
         readable.add(data);
         return;
       }
 
       buffer.push(data);
-      res = onData(data, readable, res);
+      result = onData(data, readable, result);
 
-      if (res) {
+      if (result) {
         buffer.forEach(b => {
           readable.add(b);
         });
-        resolve(Object.assign({}, res, {
+        resolve(Object.assign({}, result, {
           stream: readable
         }));
       }
