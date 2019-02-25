@@ -1,6 +1,6 @@
 /**
  * Size and type logic is based on image-size by
- * netroy (@image-size)
+ * Aditya Yadav (@netroy)
  * Licensed under the MIT License
  * https://github.com/image-size/image-size/blob/master/LICENSE
  *
