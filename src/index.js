@@ -1,6 +1,7 @@
 const JPG = require('./types/jpg');
 const PNG = require('./types/png');
 const GIF = require('./types/gif');
+const BMP = require('./types/bmp');
 const type = require('./types/type');
 
 function getImageInfo(stream) {
@@ -14,11 +15,13 @@ function getImageInfo(stream) {
         return PNG.getImageStream(stream);
       } else if (type === 'gif') {
         return GIF.getImageStream(stream);
+      } else if (type === 'bmp') {
+        return BMP.getImageStream(stream);
       } else {
-      return {
-        type,
-        stream
-      };
+        return {
+          type,
+          stream
+        };
       }
     })
 }

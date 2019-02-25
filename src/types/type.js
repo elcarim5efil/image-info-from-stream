@@ -2,6 +2,7 @@ const processStream = require('../helpers/process-stream');
 const JPG = require('./jpg');
 const PNG = require('./png');
 const GIF = require('./gif');
+const BMP = require('./bmp');
 
 function type(stream) {
   return processStream(stream, {
@@ -13,6 +14,8 @@ function type(stream) {
         type = 'png';
       } else if (GIF.is(data)) {
         type = 'gif';
+      } else if (BMP.is(data)) {
+        type = 'bmp';
       } else {
         type = 'unknown';
       }
