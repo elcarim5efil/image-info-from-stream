@@ -1,6 +1,6 @@
 {
   "name": "image-info-from-stream",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "access image info from stream",
   "main": "src/index.js",
   "scripts": {
