@@ -1,6 +1,6 @@
 const getImageInfo = require('../src/index');
 const path = require('path');
-const ImageStream = require('../src/helpers/image-stream');
+const Readable = require('stream').Readable;
 const fs = require('fs');
 const stream = fs.createReadStream(path.resolve(__dirname, './assets/test.png'));
 
@@ -14,6 +14,14 @@ test('png', () => {
       expect(type).toBe('png');
       expect(width).toEqual(1170);
       expect(height).toEqual(616);
-      expect(stream).toBeInstanceOf(ImageStream);
+      expect(stream).toBeInstanceOf(Readable);
+
+      stream.on('data', data => {
+        buffer.push(data);
+      })
+      stream.on('end', data => {
+        buffer.push(null);
+        console.log(buffer)
+      })
   });
 });

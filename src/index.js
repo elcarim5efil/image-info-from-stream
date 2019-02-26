@@ -1,5 +1,3 @@
-// const ImageStream = require('./helpers/image-stream');
-
 const Readable = require('stream').Readable;
 const jpg = require('./types/jpg');
 const png = require('./types/png');
