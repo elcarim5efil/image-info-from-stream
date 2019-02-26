@@ -8,10 +8,8 @@
  * https://github.com/image-size/image-size/blob/master/lib/types/jpg.js
  */ 
 
-const processStream = require('../helpers/process-stream');
-
-function isJPG (buffer) {
-  var SOIMarker = buffer.toString('hex', 0, 2);
+function check (chunk) {
+  var SOIMarker = chunk.toString('hex', 0, 2);
   return ('ffd8' === SOIMarker);
 }
 
@@ -33,50 +31,55 @@ function validateBuffer (buffer, i) {
   }
 }
 
-function getImageStream(stream) {
-  let buffer = [];
-  let partIndex = 0;
-  let i = -1;
-  let offset = 0;
-  function onData(data) {
-    offset = buffer[partIndex] && buffer[partIndex].length || 0;
-    partIndex++;
+function calculateSize(data, variables) {
+  let { buffer = [], partIndex = 0, i = -1, offset = 0 } = variables;
+  offset = buffer[partIndex] && buffer[partIndex].length || 0;
+  partIndex++;
 
-    let temp = data;
-    // start
-    if (i === -1) {
-      i = 4;
-    }
-
-    let next;
-    while (i < temp.length) {
-      // read length of the next block
-      let blockSize = temp.readUInt16BE(i + offset);
-
-      // ensure correct format
-      validateBuffer(temp, i + blockSize + offset);
-
-      // 0xFFC0 is baseline standard(SOF)
-      // 0xFFC1 is baseline optimized(SOF)
-      // 0xFFC2 is progressive(SOF2)
-      next = temp[i + blockSize + 1 + offset];
-      if (next === 0xC0 || next === 0xC1 || next === 0xC2) {
-        let { width, height } = extractSize(temp, i + blockSize + 5);
-        return {
-          type: 'jpg',
-          width,
-          height
-        };
-      }
-
-      // move to the next block
-      i += blockSize + 2;
-    }
+  let temp = data;
+  // start
+  if (i === -1) {
+    i = 4;
   }
-  return processStream(stream, { onData });
+
+  let next;
+  while (i < temp.length) {
+    // read length of the next block
+    let blockSize = temp.readUInt16BE(i + offset);
+
+    // ensure correct format
+    validateBuffer(temp, i + blockSize + offset);
+
+    // 0xFFC0 is baseline standard(SOF)
+    // 0xFFC1 is baseline optimized(SOF)
+    // 0xFFC2 is progressive(SOF2)
+    next = temp[i + blockSize + 1 + offset];
+    if (next === 0xC0 || next === 0xC1 || next === 0xC2) {
+      const { width, height } = extractSize(temp, i + blockSize + 5);
+      return {
+        width,
+        height
+      };
+    }
+
+    // move to the next block
+    i += blockSize + 2;
+  }
+
+  Object.assign(variables, {
+    buffer, partIndex, i, offset
+  });
+}
+
+function size(data, variables) {
+  const res = calculateSize(data, variables)
+  if (res) {
+    res.type = 'jpg';
+  }
+  return res;
 }
 
 module.exports = {
-  is: isJPG,
-  getImageStream,
+  check,
+  size,
 }

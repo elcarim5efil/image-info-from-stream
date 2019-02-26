@@ -8,28 +8,29 @@
  * https://github.com/image-size/image-size/blob/master/lib/types/bmp.js
  */
 
-const processStream = require('../helpers/process-stream');
-
-function isBMP (buffer) {
-  return ('BM' === buffer.toString('ascii', 0, 2));
+function check (chunk) {
+  return ('BM' === chunk.toString('ascii', 0, 2));
 }
 
-function getImageStream(stream) {
-  function onData(data) {
-    let width, height;
-    width = data.readUInt32LE(18);
-    height = Math.abs(data.readInt32LE(22));
+function calculateSize (chunk) {
+  const width = chunk.readUInt32LE(18);
+  const height = Math.abs(chunk.readInt32LE(22));
+  return {
+    width,
+    height
+  };
+}
 
-    return {
-      type: 'bmp',
-      height,
-      width
-    };
-  }
-  return processStream(stream, { onData });
+function size(chunk) {
+  const { width, height } = calculateSize(chunk);
+  return {
+    type: 'bmp',
+    width,
+    height
+  };
 }
 
 module.exports = {
-  is: isBMP,
-  getImageStream,
+  check,
+  size
 };

@@ -8,49 +8,50 @@
  * https://github.com/image-size/image-size/blob/master/lib/types/png.js
  */
 
-const processStream = require('../helpers/process-stream');
-
 const pngSignature = 'PNG\r\n\x1a\n';
 const pngImageHeaderChunkName = 'IHDR';
 
 // Used to detect "fried" png's: http://www.jongware.com/pngdefry.html
 const pngFriedChunkName = 'CgBI'; 
 
-function isPNG (buffer) {
+function check (chunk) {
   let chunkName
-  if (pngSignature === buffer.toString('ascii', 1, 8)) {
-    chunkName = buffer.toString('ascii', 12, 16);
+  if (pngSignature === chunk.toString('ascii', 1, 8)) {
+    chunkName = chunk.toString('ascii', 12, 16);
     if (chunkName === pngFriedChunkName) {
-      chunkName = buffer.toString('ascii', 28, 32);
+      chunkName = chunk.toString('ascii', 28, 32);
     }
     if (chunkName !== pngImageHeaderChunkName) {
       throw new TypeError('invalid png');
     }
     return true;
   }
+  return false;
 }
 
-function getImageStream(stream) {
-  function onData(data) {
-    let width, height;
-    if (data.toString('ascii', 12, 16) === pngFriedChunkName) {
-      width = data.readUInt32BE(32);
-      height = data.readUInt32BE(36);
-    } else {
-      width = data.readUInt32BE(16);
-      height = data.readUInt32BE(20);
-    }
-
-    return {
-      type: 'png',
-      height,
-      width
-    };
+function calculateSize (chunk) {
+  let width, height;
+  if (chunk.toString('ascii', 12, 16) === pngFriedChunkName) {
+    width = chunk.readUInt32BE(32);
+    height = chunk.readUInt32BE(36);
+  } else {
+    width = chunk.readUInt32BE(16);
+    height = chunk.readUInt32BE(20);
   }
-  return processStream(stream, { onData });
+  return { width, height };
+}
+
+function size (chunk) {
+  const { width, height } = calculateSize(chunk);
+  return {
+    type: 'png',
+    width,
+    height
+  };
 }
 
 module.exports = {
-  is: isPNG,
-  getImageStream,
+  name: 'png',
+  check,
+  size,
 };

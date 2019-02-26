@@ -8,30 +8,32 @@
  * https://github.com/image-size/image-size/blob/master/lib/types/gif.js
  */
 
-const processStream = require('../helpers/process-stream');
-
 const gifRegexp = /^GIF8[79]a/;
-function isGIF (buffer) {
-  const signature = buffer.toString('ascii', 0, 6);
+function check (chunk) {
+  const signature = chunk.toString('ascii', 0, 6);
   return (gifRegexp.test(signature));
 }
 
-function getImageStream(stream) {
-  function onData(data) {
-    let width, height;
-    width = data.readUInt16LE(6);
-    height = data.readUInt16LE(8);
+function calculateSize (chunk) {
+  const width = chunk.readUInt16LE(6);
+  const height = chunk.readUInt16LE(8);
+  return {
+    height,
+    width
+  };
+}
 
-    return {
-      type: 'gif',
-      height,
-      width
-    };
-  }
-  return processStream(stream, { onData });
+function size(chunk) {
+  const { width, height } = calculateSize(chunk);
+  return {
+    type: 'gif',
+    width,
+    height
+  };
 }
 
 module.exports = {
-  is: isGIF,
-  getImageStream,
+  name: 'gif',
+  check,
+  size
 };
