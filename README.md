@@ -16,6 +16,28 @@ support image file types:
 
 ## usage
 
+### callback
+
+```javascript
+const getImageInfo = require('image-infor-from-stream');
+
+getImageInfo(stream, res => {
+  const { stream, width, height, type } = res;
+  const name = `${width}x${height}.${type}`;
+  let buffer = [];
+
+  stream.on('data', (data) => {
+    buffer.push(data);
+  });
+
+  stream.on('end', () => {
+    let image = Buffer.concat(buffer);
+  });
+});
+```
+
+### promise
+
 ```javascript
 const getImageInfo = require('image-infor-from-stream');
 
