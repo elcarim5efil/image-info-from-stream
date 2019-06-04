@@ -26,8 +26,8 @@
   },
   "homepage": "https://github.com/elcarim5efil/image-info-from-stream#readme",
   "devDependencies": {
-    "coveralls": "^2.13.1",
-    "jest": "^23.1.0"
+    "coveralls": "^3.0.3",
+    "jest": "^24.8.0"
   },
   "dependencies": {
     "through2": "^3.0.1"
