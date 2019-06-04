@@ -1,4 +1,4 @@
-const Readable = require('stream').Readable;
+const through = require('through2');
 const jpg = require('./types/jpg');
 const png = require('./types/png');
 const gif = require('./types/gif');
@@ -14,19 +14,21 @@ const unknownTypeResult = {
   height: null 
 };
 
-function getImageInfoFromStream(stream, onSuccess) {
-  const readable = new Readable({
-    read() {}
-  });
+function getImageInfo(resultObj, callback) {
   let handler;
   let result;
   let variables = {};
   let innerBuffer = [];
 
-  stream.on('data', (data) => {
-    // if the result is fetched, just add to the readable stream
+  if (typeof resultObj === 'function') {
+    callback = resultObj;
+    resultObj = null;
+  }
+
+  function transformFn(data, encoding, cb) {
     if (result) {
-      readable.push(data);
+      this.push(data);
+      cb();
       return;
     }
 
@@ -50,30 +52,22 @@ function getImageInfoFromStream(stream, onSuccess) {
     if (result) {
       // if the result is fetched, flush the innerBuffer to a readable stream
       innerBuffer.forEach(b => {
-        readable.push(b);
+        this.push(b);
       });
 
+      if (resultObj) {
+        Object.assign(resultObj, result);
+      }
       // resolve the result
-      onSuccess(Object.assign({}, result, {
-        stream: readable
-      }));
+      if (typeof callback === 'function') {
+        callback(result);
+      }
     }
-  });
 
-  stream.on('end', () => {
-    readable.push(null);
-  })
-}
-
-function getImageInfo(stream, callback) {
-  const useCallback = typeof callback === 'function';
-  if (useCallback) {
-    getImageInfoFromStream(stream, callback);
-  } else {
-    return new Promise(resolve => {
-      getImageInfoFromStream(stream, resolve);
-    });
+    cb()
   }
+
+  return through(transformFn);
 }
 
 module.exports = getImageInfo;
