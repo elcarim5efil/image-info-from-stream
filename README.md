@@ -16,42 +16,31 @@ support image file types:
 
 ## usage
 
-### callback
+### Callback
 
 ```javascript
 const getImageInfo = require('image-infor-from-stream');
+const stream = fs.createReadStream('test.png');
 
-getImageInfo(stream, res => {
-  const { stream, width, height, type } = res;
-  const name = `${width}x${height}.${type}`;
-  let buffer = [];
-
-  stream.on('data', (data) => {
-    buffer.push(data);
-  });
-
-  stream.on('end', () => {
-    let image = Buffer.concat(buffer);
-  });
-});
+stream.pipe(
+  getImageInfo(res => {
+    const { width, height, type } = res;
+    const name = `${width}x${height}.${type}`;
+  })
+);
 ```
 
-### promise
+### External Object
 
 ```javascript
 const getImageInfo = require('image-infor-from-stream');
+const stream = fs.createReadStream('test.png');
+const meta = {};
 
-getImageInfo(stream)
-  .then(({ stream, width, height, type }) => {
+stream
+  .pipe(getImageInfo(meta))
+  .on('finish', () => {
+    const { width, height, type } = meta;
     const name = `${width}x${height}.${type}`;
-    let buffer = [];
-
-    stream.on('data', (data) => {
-      buffer.push(data);
-    });
-
-    stream.on('end', () => {
-      let image = Buffer.concat(buffer);
-    });
-});
+  });
 ```
