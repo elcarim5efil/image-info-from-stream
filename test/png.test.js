@@ -1,48 +1,36 @@
 const getImageInfo = require('../src/index');
 const path = require('path');
-const Readable = require('stream').Readable;
 const fs = require('fs');
 
 describe('png', () => {
-  test('promise', () => {
+  test('callback', (done) => {
     const stream = fs.createReadStream(path.resolve(__dirname, './assets/test.png'));
-    return getImageInfo(stream)
-      .then((res) => {
-        const {
-          stream,
-          width,
-          height,
-          type
-        } = res;
+    stream.pipe(
+      getImageInfo(res => {
+        const { width, height, type } = res;
 
         let buffer = [];
 
         expect(type).toBe('png');
         expect(width).toEqual(1170);
         expect(height).toEqual(616);
-        expect(stream).toBeInstanceOf(Readable);
-
-        stream.on('data', data => {
-          buffer.push(data);
-        })
-        stream.on('end', data => {
-          buffer.push(null);
-        })
-      });
+        // expect(stream).toBeInstanceOf(Transform);
+        done();
+      })
+    )
   });
 
-  test('callback', (done) => {
+  test('meta', (done) => {
     const stream = fs.createReadStream(path.resolve(__dirname, './assets/test.png'));
-    getImageInfo(stream, res => {
-      const { stream, width, height, type } = res;
-
-      let buffer = [];
-
-      expect(type).toBe('png');
-      expect(width).toEqual(1170);
-      expect(height).toEqual(616);
-      expect(stream).toBeInstanceOf(Readable);
-      done();
-    });
+    const meta = {};
+    stream
+      .pipe(getImageInfo(meta))
+      .on('finish', () => {
+        const { width, height, type } = meta;
+        expect(type).toBe('png');
+        expect(width).toEqual(1170);
+        expect(height).toEqual(616);
+        done();
+      })
   });
 });
